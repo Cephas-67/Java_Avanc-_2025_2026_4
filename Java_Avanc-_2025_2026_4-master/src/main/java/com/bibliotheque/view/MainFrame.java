@@ -116,10 +116,11 @@ public class MainFrame extends JFrame {
         navLabel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 0));
         panel.add(navLabel);
 
-        btnAccueil = createNavButton("🏠  Tableau de bord", "HOME");
-        btnLivres = createNavButton("📖  Livres", "LIVRES");
-        btnMembres = createNavButton("👥  Membres", "MEMBRES");
-        btnEmprunts = createNavButton("🔄  Emprunts", "EMPRUNTS");
+        // ✅ CORRECTION : Ajout des icônes SVG
+        btnAccueil = createNavButton("Tableau de bord", "HOME", createHomeSVG());
+        btnLivres = createNavButton("Livres", "LIVRES", createBookSVG());
+        btnMembres = createNavButton("Membres", "MEMBRES", createUserSVG());
+        btnEmprunts = createNavButton("Emprunts", "EMPRUNTS", createBorrowSVG());
 
         panel.add(btnAccueil);
         panel.add(Box.createVerticalStrut(5));
@@ -148,8 +149,9 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
-    private NavButton createNavButton(String text, String view) {
-        NavButton button = new NavButton(text);
+    // ✅ CORRECTION : Méthode modifiée pour accepter un Icon
+    private NavButton createNavButton(String text, String view, Icon icon) {
+        NavButton button = new NavButton(text, icon);
 
         button.setMaximumSize(new Dimension(240, 45));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -162,6 +164,7 @@ public class MainFrame extends JFrame {
         button.setContentAreaFilled(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setIconTextGap(15);
 
         button.addActionListener(e -> {
             showView(view);
@@ -339,8 +342,9 @@ public class MainFrame extends JFrame {
     private static class NavButton extends JButton {
         private boolean isActive = false;
 
-        public NavButton(String text) {
-            super(text);
+        // ✅ CORRECTION : Constructeur avec Icon
+        public NavButton(String text, Icon icon) {
+            super(text, icon);
         }
 
         @Override
@@ -368,5 +372,90 @@ public class MainFrame extends JFrame {
         public boolean isActive() {
             return isActive;
         }
+    }
+
+    // ==================== ICÔNES SVG POUR LA NAVIGATION ====================
+
+    private Icon createHomeSVG() {
+        return new Icon() {
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(PRIMARY_COLOR);
+                g2.setStroke(new BasicStroke(2));
+
+                int[] xPoints = {x + 12, x + 24, x + 18, x + 6};
+                int[] yPoints = {y + 6, y + 12, y + 12, y + 12};
+                g2.drawPolygon(xPoints, yPoints, 4);
+                g2.drawLine(x + 6, y + 12, x + 6, y + 22);
+                g2.drawLine(x + 18, y + 12, x + 18, y + 22);
+                g2.drawLine(x + 6, y + 22, x + 18, y + 22);
+                g2.drawRect(x + 10, y + 16, 4, 6);
+
+                g2.dispose();
+            }
+            public int getIconWidth() { return 24; }
+            public int getIconHeight() { return 24; }
+        };
+    }
+
+    private Icon createBookSVG() {
+        return new Icon() {
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(PRIMARY_COLOR);
+                g2.setStroke(new BasicStroke(2));
+
+                g2.drawRect(x + 6, y + 4, 12, 16);
+                g2.drawLine(x + 10, y + 4, x + 10, y + 20);
+                g2.drawLine(x + 6, y + 8, x + 18, y + 8);
+
+                g2.dispose();
+            }
+            public int getIconWidth() { return 24; }
+            public int getIconHeight() { return 24; }
+        };
+    }
+
+    private Icon createUserSVG() {
+        return new Icon() {
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(PRIMARY_COLOR);
+                g2.setStroke(new BasicStroke(2));
+
+                g2.drawOval(x + 8, y + 4, 8, 8);
+                Path2D path = new Path2D.Double();
+                path.moveTo(x + 5, y + 20);
+                path.curveTo(x + 5, y + 16, x + 8, y + 14, x + 12, y + 14);
+                path.curveTo(x + 16, y + 14, x + 19, y + 16, x + 19, y + 20);
+                g2.draw(path);
+
+                g2.dispose();
+            }
+            public int getIconWidth() { return 24; }
+            public int getIconHeight() { return 24; }
+        };
+    }
+
+    private Icon createBorrowSVG() {
+        return new Icon() {
+            public void paintIcon(Component c, Graphics g, int x, int y) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(PRIMARY_COLOR);
+                g2.setStroke(new BasicStroke(2));
+
+                g2.drawArc(x + 4, y + 4, 16, 16, 45, 270);
+                g2.drawLine(x + 18, y + 6, x + 20, y + 4);
+                g2.drawLine(x + 18, y + 6, x + 20, y + 8);
+
+                g2.dispose();
+            }
+            public int getIconWidth() { return 24; }
+            public int getIconHeight() { return 24; }
+        };
     }
 }

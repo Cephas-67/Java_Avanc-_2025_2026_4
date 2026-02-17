@@ -48,6 +48,6 @@ public class Livre {
     }
 
     public int getAnnee() {
-        return 0;
+        return anneePublication;
     }
 }

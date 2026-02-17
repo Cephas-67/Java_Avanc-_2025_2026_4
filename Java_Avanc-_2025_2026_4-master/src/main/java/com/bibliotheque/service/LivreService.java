@@ -82,8 +82,22 @@ public class LivreService {
             throw new Exception("Le titre est obligatoire");
         }
 
-        if (livre.getAnnee() < 1000 || livre.getAnnee() > 2100) {
-            throw new Exception("L'année de publication doit être entre 1000 et 2100");
+        // ✅ CORRECTION : Validation d'année assouplie ou supprimée
+        // Option 1: Supprimer complètement la validation d'année
+        // (décommentez cette ligne si vous voulez aucune validation)
+        // if (// ✅ BON
+        //livre.getAnneePublication()  <= 0) {
+        //     throw new Exception("L'année de publication doit être un nombre positif");
+        // }
+
+        // Option 2: Validation très permissive (année > 0)
+        if (livre.getAnneePublication() <= 0) {
+            throw new Exception("L'année de publication doit être un nombre positif");
         }
+
+        // Option 3: Validation raisonnable (entre 1 et 9999)
+        // if (livre.getAnneePublication() < 1 || livre.getAnnee() > 9999) {
+        //     throw new Exception("L'année de publication doit être entre 1 et 9999");
+        // }
     }
 }
