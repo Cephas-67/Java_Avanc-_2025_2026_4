@@ -9,12 +9,13 @@ public class Membre {
     private String telephone;
     private String lieuResidence;
     private double penalite;
+    private boolean actif; // Nouveau champ
 
     public Membre() {
     }
 
     public Membre(int idMembre, String nom, String prenom, String email,
-                  String telephone, String lieuResidence, double penalite) {
+                  String telephone, String lieuResidence, double penalite, boolean actif) {
         this.idMembre = idMembre;
         this.nom = nom;
         this.prenom = prenom;
@@ -22,6 +23,7 @@ public class Membre {
         this.telephone = telephone;
         this.lieuResidence = lieuResidence;
         this.penalite = penalite;
+        this.actif = actif;
     }
 
     public int getIdMembre() {
@@ -78,5 +80,13 @@ public class Membre {
 
     public void setPenalite(double penalite) {
         this.penalite = penalite;
+    }
+
+    public boolean isActif() {
+        return actif;
+    }
+
+    public void setActif(boolean actif) {
+        this.actif = actif;
     }
 }

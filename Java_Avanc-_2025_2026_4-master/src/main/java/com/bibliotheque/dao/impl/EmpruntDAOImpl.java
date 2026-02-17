@@ -39,10 +39,7 @@ public class EmpruntDAOImpl implements EmpruntDAO {
                 }
             }
 
-            System.out.println("Emprunt enregistré avec succès");
-
         } catch (SQLException e) {
-            System.err.println("Erreur lors de l'enregistrement de l'emprunt: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Erreur lors de l'enregistrement de l'emprunt", e);
         }
@@ -59,20 +56,47 @@ public class EmpruntDAOImpl implements EmpruntDAO {
             pstmt.setInt(2, idEmprunt);
 
             pstmt.executeUpdate();
-            System.out.println("Retour enregistré avec succès");
 
         } catch (SQLException e) {
-            System.err.println("Erreur lors de l'enregistrement du retour: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Erreur lors de l'enregistrement du retour", e);
         }
     }
 
+    // ✅ AJOUT IMPORTANT : findById (nécessaire pour EmpruntService)
+    public Emprunt findById(int idEmprunt) {
+
+        String sql = "SELECT e.*, m.nom, m.prenom, m.email, m.telephone, m.lieu_residence, m.penalite, " +
+                "l.titre, l.annee_publication, l.quantite_disponible " +
+                "FROM Emprunt e " +
+                "JOIN Membre m ON e.id_membre = m.id_membre " +
+                "JOIN Livre l ON e.id_livre = l.id_livre " +
+                "WHERE e.id_emprunt = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idEmprunt);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return extractEmpruntFromResultSet(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     @Override
     public List<Emprunt> findByMembre(int idMembre) {
         List<Emprunt> emprunts = new ArrayList<>();
+
         String sql = "SELECT e.*, m.nom, m.prenom, m.email, m.telephone, m.lieu_residence, m.penalite, " +
-                "l.titre, l.annee_publication " +
+                "l.titre, l.annee_publication, l.quantite_disponible " +
                 "FROM Emprunt e " +
                 "JOIN Membre m ON e.id_membre = m.id_membre " +
                 "JOIN Livre l ON e.id_livre = l.id_livre " +
@@ -91,7 +115,6 @@ public class EmpruntDAOImpl implements EmpruntDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la récupération des emprunts: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -101,8 +124,9 @@ public class EmpruntDAOImpl implements EmpruntDAO {
     @Override
     public List<Emprunt> findEnCours() {
         List<Emprunt> emprunts = new ArrayList<>();
+
         String sql = "SELECT e.*, m.nom, m.prenom, m.email, m.telephone, m.lieu_residence, m.penalite, " +
-                "l.titre, l.annee_publication " +
+                "l.titre, l.annee_publication, l.quantite_disponible " +
                 "FROM Emprunt e " +
                 "JOIN Membre m ON e.id_membre = m.id_membre " +
                 "JOIN Livre l ON e.id_livre = l.id_livre " +
@@ -118,7 +142,6 @@ public class EmpruntDAOImpl implements EmpruntDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la récupération des emprunts en cours: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -127,8 +150,9 @@ public class EmpruntDAOImpl implements EmpruntDAO {
 
     public List<Emprunt> findAll() {
         List<Emprunt> emprunts = new ArrayList<>();
+
         String sql = "SELECT e.*, m.nom, m.prenom, m.email, m.telephone, m.lieu_residence, m.penalite, " +
-                "l.titre, l.annee_publication " +
+                "l.titre, l.annee_publication, l.quantite_disponible " +
                 "FROM Emprunt e " +
                 "JOIN Membre m ON e.id_membre = m.id_membre " +
                 "JOIN Livre l ON e.id_livre = l.id_livre " +
@@ -143,7 +167,6 @@ public class EmpruntDAOImpl implements EmpruntDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la récupération de tous les emprunts: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -154,6 +177,7 @@ public class EmpruntDAOImpl implements EmpruntDAO {
      * Extraire un objet Emprunt depuis un ResultSet
      */
     private Emprunt extractEmpruntFromResultSet(ResultSet rs) throws SQLException {
+
         Membre membre = new Membre(
                 rs.getInt("id_membre"),
                 rs.getString("nom"),
@@ -168,7 +192,8 @@ public class EmpruntDAOImpl implements EmpruntDAO {
                 rs.getInt("id_livre"),
                 rs.getString("titre"),
                 rs.getInt("annee_publication"),
-                "Général"
+                "Général",
+                rs.getInt("quantite_disponible")
         );
 
         Date dateRetourEffective = rs.getDate("date_retour_effective");

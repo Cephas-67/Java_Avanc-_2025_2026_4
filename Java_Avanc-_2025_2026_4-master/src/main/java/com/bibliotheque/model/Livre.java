@@ -6,15 +6,17 @@ public class Livre {
     private String titre;
     private int annee;
     private String categorie;
+    private int quantiteDisponible; // correspond à la base
 
     public Livre() {
     }
 
-    public Livre(int idLivre, String titre, int annee, String categorie) {
+    public Livre(int idLivre, String titre, int annee, String categorie, int quantiteDisponible) {
         this.idLivre = idLivre;
         this.titre = titre;
         this.annee = annee;
         this.categorie = categorie;
+        this.quantiteDisponible = quantiteDisponible;
     }
 
     public int getIdLivre() {
@@ -47,6 +49,18 @@ public class Livre {
 
     public void setCategorie(String categorie) {
         this.categorie = categorie;
+    }
+
+    public int getQuantiteDisponible() {
+        return quantiteDisponible;
+    }
+
+    public void setQuantiteDisponible(int quantiteDisponible) {
+        this.quantiteDisponible = quantiteDisponible;
+    }
+
+    public boolean estDisponible() {
+        return quantiteDisponible > 0;
     }
 
     @Override

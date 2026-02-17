@@ -16,14 +16,15 @@ public class LivreDAOImpl implements LivreDAO {
     @Override
     public void add(Livre livre) {
         String sql = "INSERT INTO Livre (titre, annee_publication, isbn, quantite_disponible) " +
-                "VALUES (?, ?, ?, 1)";
+                "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, livre.getTitre());
             pstmt.setInt(2, livre.getAnnee());
-            pstmt.setString(3, generateISBN()); // Génération automatique pour simplifier
+            pstmt.setString(3, generateISBN());
+            pstmt.setInt(4, livre.getQuantiteDisponible());
 
             int affectedRows = pstmt.executeUpdate();
 
@@ -46,14 +47,15 @@ public class LivreDAOImpl implements LivreDAO {
 
     @Override
     public void update(Livre livre) {
-        String sql = "UPDATE Livre SET titre = ?, annee_publication = ? WHERE id_livre = ?";
+        String sql = "UPDATE Livre SET titre = ?, annee_publication = ?, quantite_disponible = ? WHERE id_livre = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, livre.getTitre());
             pstmt.setInt(2, livre.getAnnee());
-            pstmt.setInt(3, livre.getIdLivre());
+            pstmt.setInt(3, livre.getQuantiteDisponible());
+            pstmt.setInt(4, livre.getIdLivre());
 
             pstmt.executeUpdate();
             System.out.println("Livre modifié avec succès: " + livre.getTitre());
@@ -158,7 +160,8 @@ public class LivreDAOImpl implements LivreDAO {
                 rs.getInt("id_livre"),
                 rs.getString("titre"),
                 rs.getInt("annee_publication"),
-                "Général" // Catégorie par défaut
+                "Général",
+                rs.getInt("quantite_disponible")
         );
     }
 
