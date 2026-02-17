@@ -1,4 +1,4 @@
-package com.bibliotheque.model;
+package main.java.com.bibliotheque.model;
 
 public class Membre {
 

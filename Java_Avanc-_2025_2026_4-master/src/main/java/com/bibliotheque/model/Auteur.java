@@ -1,22 +1,22 @@
-package com.bibliotheque.model;
+package main.java.com.bibliotheque.model;
 
 public class Auteur {
 
     private int idAuteur;
     private String nom;
     private String prenom;
-    private String bibliographie;
-    private String email;
+    private String biographie;
+    private String nationalite;
 
     public Auteur() {
     }
 
-    public Auteur(int idAuteur, String nom, String prenom, String bibliographie, String email) {
+    public Auteur(int idAuteur, String nom, String prenom, String biographie, String nationalite) {
         this.idAuteur = idAuteur;
         this.nom = nom;
         this.prenom = prenom;
-        this.bibliographie = bibliographie;
-        this.email = email;
+        this.biographie = biographie;
+        this.nationalite = nationalite;
     }
 
     public int getIdAuteur() {
@@ -43,19 +43,19 @@ public class Auteur {
         this.prenom = prenom;
     }
 
-    public String getBibliographie() {
-        return bibliographie;
+    public String getBiographie() {
+        return biographie;
     }
 
-    public void setBibliographie(String bibliographie) {
-        this.bibliographie = bibliographie;
+    public void setBiographie(String biographie) {
+        this.biographie = biographie;
     }
 
-    public String getEmail() {
-        return email;
+    public String getNationalite() {
+        return nationalite;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setNationalite(String nationalite) {
+        this.nationalite = nationalite;
     }
 }

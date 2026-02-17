@@ -1,14 +1,17 @@
 package main.java.com.bibliotheque.view;
 
-import com.bibliotheque.model.Emprunt;
-import com.bibliotheque.model.Livre;
-import com.bibliotheque.model.Membre;
+import main.java.com.bibliotheque.model.Emprunt;
+import main.java.com.bibliotheque.model.Livre;
+import main.java.com.bibliotheque.model.Membre;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class EmpruntView extends JPanel {
 
@@ -289,7 +292,8 @@ public class EmpruntView extends JPanel {
         return button;
     }
 
-    // Méthodes publiques
+    // ==================== MÉTHODES PUBLIQUES POUR LE CONTRÔLEUR ====================
+
     public void addEmpruntToTable(Emprunt emprunt) {
         String membreNom = emprunt.getMembre().getNom() + " " + emprunt.getMembre().getPrenom();
         String livreTitre = emprunt.getLivre().getTitre();
@@ -342,15 +346,17 @@ public class EmpruntView extends JPanel {
         return (int) tableModel.getValueAt(selectedRow, 0);
     }
 
-    public void updateMembreCombo(java.util.List<Membre> membres) {
+    public void updateMembreCombo(List<Membre> membres) {
         membreCombo.removeAllItems();
+        membreCombo.addItem("-- Sélectionner un membre --");
         for (Membre m : membres) {
             membreCombo.addItem(m.getIdMembre() + " - " + m.getNom() + " " + m.getPrenom());
         }
     }
 
-    public void updateLivreCombo(java.util.List<Livre> livres) {
+    public void updateLivreCombo(List<Livre> livres) {
         livreCombo.removeAllItems();
+        livreCombo.addItem("-- Sélectionner un livre --");
         for (Livre l : livres) {
             livreCombo.addItem(l.getIdLivre() + " - " + l.getTitre());
         }
@@ -358,14 +364,22 @@ public class EmpruntView extends JPanel {
 
     public int getSelectedMembreId() {
         String selected = (String) membreCombo.getSelectedItem();
-        if (selected == null) return -1;
-        return Integer.parseInt(selected.split(" - ")[0]);
+        if (selected == null || selected.startsWith("--")) return -1;
+        try {
+            return Integer.parseInt(selected.split(" - ")[0]);
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     public int getSelectedLivreId() {
         String selected = (String) livreCombo.getSelectedItem();
-        if (selected == null) return -1;
-        return Integer.parseInt(selected.split(" - ")[0]);
+        if (selected == null || selected.startsWith("--")) return -1;
+        try {
+            return Integer.parseInt(selected.split(" - ")[0]);
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     public LocalDate getDateEmprunt() {
@@ -384,7 +398,7 @@ public class EmpruntView extends JPanel {
         }
     }
 
-    // Getters
+    // Getters pour les boutons
     public JButton getAddButton() { return addButton; }
     public JButton getReturnButton() { return returnButton; }
     public JButton getDeleteButton() { return deleteButton; }
@@ -392,7 +406,13 @@ public class EmpruntView extends JPanel {
     public JTextField getSearchField() { return searchField; }
     public JTable getEmpruntsTable() { return empruntsTable; }
 
-    // Icônes SVG
+    // Méthode pour obtenir le panel principal (utilisé par MainFrame)
+    public JPanel getMainPanel() {
+        return this;
+    }
+
+    // ==================== ICÔNES SVG ====================
+
     private Icon createBorrowIcon() {
         return new Icon() {
             public void paintIcon(Component c, Graphics g, int x, int y) {

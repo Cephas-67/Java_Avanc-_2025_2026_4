@@ -1,12 +1,9 @@
 package main.java.com.bibliotheque.view;
 
-import com.bibliotheque.model.Livre;
+import main.java.com.bibliotheque.model.Livre;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
-import java.awt.geom.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LivreView extends JPanel {
 
@@ -230,7 +227,7 @@ public class LivreView extends JPanel {
         Object[] row = {
                 livre.getIdLivre(),
                 livre.getTitre(),
-                livre.getAnnee(),
+                livre.getAnneePublication(),  // ← CORRIGÉ
                 livre.getCategorie()
         };
         tableModel.addRow(row);
@@ -279,7 +276,7 @@ public class LivreView extends JPanel {
 
     public void fillFormWithLivre(Livre livre) {
         titreField.setText(livre.getTitre());
-        anneeField.setText(String.valueOf(livre.getAnnee()));
+        anneeField.setText(String.valueOf(livre.getAnneePublication()));  // ← CORRIGÉ
         categorieField.setText(livre.getCategorie());
     }
 
@@ -405,5 +402,10 @@ public class LivreView extends JPanel {
             public int getIconWidth() { return 16; }
             public int getIconHeight() { return 16; }
         };
+    }
+
+    // ✅ CORRECTION ICI
+    public JPanel getMainPanel() {
+        return this;  // ← Retourne le JPanel lui-même, PAS null
     }
 }

@@ -1,11 +1,15 @@
-package com.bibliotheque.dao.interfaces;
+package main.java.com.bibliotheque.dao.interfaces;
 
-import com.bibliotheque.model.MaisonEdition;
+import main.java.com.bibliotheque.model.MaisonEdition;
 import java.util.List;
 
 public interface MaisonEditionDAO {
 
     void add(MaisonEdition maisonEdition);
+
+    void update(MaisonEdition maisonEdition);
+
+    void delete(int idMaisonEdition);
 
     MaisonEdition findById(int idMaisonEdition);
 

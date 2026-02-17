@@ -1,31 +1,50 @@
 package main.java.com.bibliotheque.view;
 
+import main.java.com.bibliotheque.service.LivreService;
+import main.java.com.bibliotheque.service.MembreService;
+import main.java.com.bibliotheque.service.EmpruntService;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
-public static class MainFrame extends JFrame {
+/**
+ * Fenêtre principale de l'application avec navigation par onglets
+ */
+public class MainFrame extends JFrame {
 
     private JPanel contentPanel;
     private LivreView livreView;
     private MembreView membreView;
     private EmpruntView empruntView;
 
+    private JLabel livresCountLabel;
+    private JLabel membresCountLabel;
+    private JLabel empruntsCountLabel;
+
+    private NavButton btnAccueil, btnLivres, btnMembres, btnEmprunts;
+
     // Couleurs du thème
-    private static final Color PRIMARY_COLOR = new Color(37, 99, 235); // Bleu
-    private static final Color SECONDARY_COLOR = new Color(248, 250, 252); // Gris clair
-    private static final Color ACCENT_COLOR = new Color(99, 102, 241); // Indigo
+    private static final Color PRIMARY_COLOR = new Color(37, 99, 235);
+    private static final Color SECONDARY_COLOR = new Color(248, 250, 252);
     private static final Color TEXT_COLOR = new Color(51, 65, 85);
     private static final Color HOVER_COLOR = new Color(219, 234, 254);
+    private static final Color SUCCESS_COLOR = new Color(16, 185, 129);
+    private static final Color WARNING_COLOR = new Color(245, 158, 11);
 
     public MainFrame() {
-        setTitle("Système de Gestion de Bibliothèque");
+        setTitle("Système de Gestion de Bibliothèque - BiblioTech");
         setSize(1400, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setMinimumSize(new Dimension(1200, 700));
 
         initializeViews();
         setupUI();
+        updateStatistics();
     }
 
     private void initializeViews() {
@@ -37,76 +56,103 @@ public static class MainFrame extends JFrame {
     private void setupUI() {
         setLayout(new BorderLayout());
 
-        // Panneau de navigation latéral
         JPanel sidePanel = createSidePanel();
         add(sidePanel, BorderLayout.WEST);
 
-        // Zone de contenu principal
         contentPanel = new JPanel(new CardLayout());
         contentPanel.setBackground(SECONDARY_COLOR);
 
-        // Panneau d'accueil
         JPanel homePanel = createHomePanel();
         contentPanel.add(homePanel, "HOME");
-        contentPanel.add(livreView, "LIVRES");
-        contentPanel.add(membreView, "MEMBRES");
-        contentPanel.add(empruntView, "EMPRUNTS");
+        contentPanel.add(livreView.getMainPanel(), "LIVRES");
+        contentPanel.add(membreView.getMainPanel(), "MEMBRES");
+        contentPanel.add(empruntView.getMainPanel(), "EMPRUNTS");
 
         add(contentPanel, BorderLayout.CENTER);
     }
 
     private JPanel createSidePanel() {
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(250, getHeight()));
+        panel.setPreferredSize(new Dimension(260, getHeight()));
         panel.setBackground(Color.WHITE);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new Color(226, 232, 240)));
+        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new Color(226, 232, 240)));
 
-        // En-tête avec logo
+        // En-tête
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(Color.WHITE);
-        headerPanel.setMaximumSize(new Dimension(250, 100));
-        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        headerPanel.setBackground(PRIMARY_COLOR);
+        headerPanel.setMaximumSize(new Dimension(260, 120));
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
 
-        JLabel titleLabel = new JLabel("📚 Bibliothèque");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        titleLabel.setForeground(PRIMARY_COLOR);
+        JLabel logoLabel = new JLabel("📚");
+        logoLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel titleLabel = new JLabel("BiblioTech");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitleLabel = new JLabel("Gestion Moderne");
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        subtitleLabel.setForeground(new Color(219, 234, 254));
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        headerPanel.add(logoLabel);
+        headerPanel.add(Box.createVerticalStrut(10));
         headerPanel.add(titleLabel);
+        headerPanel.add(Box.createVerticalStrut(5));
+        headerPanel.add(subtitleLabel);
 
         panel.add(headerPanel);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(30));
 
-        // Boutons de navigation
-        panel.add(createNavButton("Accueil", "HOME", createHomeSVG()));
-        panel.add(createNavButton("Livres", "LIVRES", createBookSVG()));
-        panel.add(createNavButton("Membres", "MEMBRES", createUserSVG()));
-        panel.add(createNavButton("Emprunts", "EMPRUNTS", createBorrowSVG()));
+        // Navigation
+        JLabel navLabel = new JLabel("NAVIGATION");
+        navLabel.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        navLabel.setForeground(new Color(100, 116, 139));
+        navLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        navLabel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 0));
+        panel.add(navLabel);
 
-        // Espacement flexible
+        btnAccueil = createNavButton("🏠  Tableau de bord", "HOME");
+        btnLivres = createNavButton("📖  Livres", "LIVRES");
+        btnMembres = createNavButton("👥  Membres", "MEMBRES");
+        btnEmprunts = createNavButton("🔄  Emprunts", "EMPRUNTS");
+
+        panel.add(btnAccueil);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(btnLivres);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(btnMembres);
+        panel.add(Box.createVerticalStrut(5));
+        panel.add(btnEmprunts);
+
         panel.add(Box.createVerticalGlue());
+
+        // Footer
+        JPanel footerPanel = new JPanel();
+        footerPanel.setBackground(Color.WHITE);
+        footerPanel.setMaximumSize(new Dimension(260, 60));
+        footerPanel.setLayout(new BoxLayout(footerPanel, BoxLayout.Y_AXIS));
+        footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
+
+        JLabel versionLabel = new JLabel("Version 1.0.0");
+        versionLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        versionLabel.setForeground(new Color(148, 163, 184));
+        versionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        footerPanel.add(versionLabel);
+        panel.add(footerPanel);
 
         return panel;
     }
 
-    private JButton createNavButton(String text, String view, Icon icon) {
-        JButton button = new JButton(text, icon) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    private NavButton createNavButton(String text, String view) {
+        NavButton button = new NavButton(text);
 
-                if (getModel().isRollover()) {
-                    g2.setColor(HOVER_COLOR);
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                }
-
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
-
-        button.setMaximumSize(new Dimension(230, 45));
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(240, 45));
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         button.setForeground(TEXT_COLOR);
@@ -115,62 +161,112 @@ public static class MainFrame extends JFrame {
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setIconTextGap(15);
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        button.addActionListener(e -> showView(view));
+        button.addActionListener(e -> {
+            showView(view);
+            updateActiveButton(button);
+            if (view.equals("HOME")) {
+                updateStatistics();
+            }
+        });
 
         return button;
     }
 
+    private void updateActiveButton(NavButton activeButton) {
+        btnAccueil.setActive(false);
+        btnLivres.setActive(false);
+        btnMembres.setActive(false);
+        btnEmprunts.setActive(false);
+        activeButton.setActive(true);
+    }
+
     private JPanel createHomePanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout(20, 20));
         panel.setBackground(SECONDARY_COLOR);
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(SECONDARY_COLOR);
 
-        // Titre de bienvenue
-        JLabel welcomeLabel = new JLabel("Bienvenue dans le Système de Gestion");
+        JLabel welcomeLabel = new JLabel("Tableau de Bord");
         welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
         welcomeLabel.setForeground(TEXT_COLOR);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 3;
-        panel.add(welcomeLabel, gbc);
 
-        // Cartes statistiques
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
+        JLabel dateLabel = new JLabel(LocalDate.now().format(
+                DateTimeFormatter.ofPattern("EEEE dd MMMM yyyy", Locale.FRENCH)
+        ));
+        dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        dateLabel.setForeground(new Color(100, 116, 139));
 
-        panel.add(createStatCard("Livres", "0", PRIMARY_COLOR, createBookSVG()), gbc);
+        JPanel headerTextPanel = new JPanel();
+        headerTextPanel.setLayout(new BoxLayout(headerTextPanel, BoxLayout.Y_AXIS));
+        headerTextPanel.setBackground(SECONDARY_COLOR);
+        headerTextPanel.add(welcomeLabel);
+        headerTextPanel.add(Box.createVerticalStrut(5));
+        headerTextPanel.add(dateLabel);
 
-        gbc.gridx = 1;
-        panel.add(createStatCard("Membres", "0", new Color(16, 185, 129), createUserSVG()), gbc);
+        headerPanel.add(headerTextPanel, BorderLayout.WEST);
+        panel.add(headerPanel, BorderLayout.NORTH);
 
-        gbc.gridx = 2;
-        panel.add(createStatCard("Emprunts Actifs", "0", new Color(245, 158, 11), createBorrowSVG()), gbc);
+        JPanel statsPanel = new JPanel(new GridLayout(1, 3, 20, 20));
+        statsPanel.setBackground(SECONDARY_COLOR);
+
+        livresCountLabel = new JLabel("0");
+        JPanel livresCard = createStatCard("Livres Disponibles", livresCountLabel, PRIMARY_COLOR, "📚");
+        statsPanel.add(livresCard);
+
+        membresCountLabel = new JLabel("0");
+        JPanel membresCard = createStatCard("Membres Inscrits", membresCountLabel, SUCCESS_COLOR, "👥");
+        statsPanel.add(membresCard);
+
+        empruntsCountLabel = new JLabel("0");
+        JPanel empruntsCard = createStatCard("Emprunts Actifs", empruntsCountLabel, WARNING_COLOR, "🔄");
+        statsPanel.add(empruntsCard);
+
+        panel.add(statsPanel, BorderLayout.CENTER);
+
+        JPanel welcomePanel = new JPanel();
+        welcomePanel.setBackground(Color.WHITE);
+        welcomePanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
+                BorderFactory.createEmptyBorder(25, 25, 25, 25)
+        ));
+        welcomePanel.setLayout(new BoxLayout(welcomePanel, BoxLayout.Y_AXIS));
+
+        JLabel infoTitle = new JLabel("✨ Bienvenue dans BiblioTech");
+        infoTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        infoTitle.setForeground(TEXT_COLOR);
+
+        JLabel infoText = new JLabel(
+                "<html>Gérez efficacement votre bibliothèque avec notre système moderne et intuitif.<br>" +
+                        "Utilisez le menu de navigation pour accéder aux différentes fonctionnalités.</html>"
+        );
+        infoText.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        infoText.setForeground(new Color(100, 116, 139));
+
+        welcomePanel.add(infoTitle);
+        welcomePanel.add(Box.createVerticalStrut(10));
+        welcomePanel.add(infoText);
+
+        panel.add(welcomePanel, BorderLayout.SOUTH);
 
         return panel;
     }
 
-    private JPanel createStatCard(String title, String value, Color color, Icon icon) {
+    private JPanel createStatCard(String title, JLabel valueLabel, Color color, String emoji) {
         JPanel card = new JPanel(new BorderLayout(15, 15));
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+                BorderFactory.createEmptyBorder(25, 25, 25, 25)
         ));
-        card.setPreferredSize(new Dimension(250, 150));
 
-        // Icône
-        JLabel iconLabel = new JLabel(icon);
+        JLabel iconLabel = new JLabel(emoji);
+        iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         card.add(iconLabel, BorderLayout.WEST);
 
-        // Texte
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setBackground(Color.WHITE);
@@ -179,8 +275,7 @@ public static class MainFrame extends JFrame {
         titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         titleLabel.setForeground(new Color(100, 116, 139));
 
-        JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 40));
         valueLabel.setForeground(color);
 
         textPanel.add(titleLabel);
@@ -188,7 +283,6 @@ public static class MainFrame extends JFrame {
         textPanel.add(valueLabel);
 
         card.add(textPanel, BorderLayout.CENTER);
-
         return card;
     }
 
@@ -197,119 +291,82 @@ public static class MainFrame extends JFrame {
         cl.show(contentPanel, viewName);
     }
 
-    // Méthodes pour créer des icônes SVG
-    private Icon createHomeSVG() {
-        return new Icon() {
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(PRIMARY_COLOR);
-                g2.setStroke(new BasicStroke(2));
+    public void updateStatistics() {
+        SwingWorker<int[], Void> worker = new SwingWorker<>() {
+            @Override
+            protected int[] doInBackground() {
+                try {
+                    LivreService livreService = new LivreService();
+                    MembreService membreService = new MembreService();
+                    EmpruntService empruntService = new EmpruntService();
 
-                // Maison
-                int[] xPoints = {x + 12, x + 24, x + 18, x + 6};
-                int[] yPoints = {y + 6, y + 12, y + 12, y + 12};
-                g2.drawPolygon(xPoints, yPoints, 4);
-                g2.drawLine(x + 6, y + 12, x + 6, y + 22);
-                g2.drawLine(x + 18, y + 12, x + 18, y + 22);
-                g2.drawLine(x + 6, y + 22, x + 18, y + 22);
-                g2.drawRect(x + 10, y + 16, 4, 6);
+                    int livresCount = livreService.getAllLivres().size();
+                    int membresCount = membreService.getAllMembres().size();
+                    int empruntsCount = empruntService.getEmpruntsEnCours().size();
 
-                g2.dispose();
+                    return new int[]{livresCount, membresCount, empruntsCount};
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new int[]{0, 0, 0};
+                }
             }
-            public int getIconWidth() { return 24; }
-            public int getIconHeight() { return 24; }
+
+            @Override
+            protected void done() {
+                try {
+                    int[] stats = get();
+                    livresCountLabel.setText(String.valueOf(stats[0]));
+                    membresCountLabel.setText(String.valueOf(stats[1]));
+                    empruntsCountLabel.setText(String.valueOf(stats[2]));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         };
+        worker.execute();
     }
 
-    private Icon createBookSVG() {
-        return new Icon() {
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(PRIMARY_COLOR);
-                g2.setStroke(new BasicStroke(2));
+    // Getters pour les contrôleurs
+    public LivreView getLivreView() { return livreView; }
+    public MembreView getMembreView() { return membreView; }
+    public EmpruntView getEmpruntView() { return empruntView; }
 
-                // Livre
-                g2.drawRect(x + 6, y + 4, 12, 16);
-                g2.drawLine(x + 10, y + 4, x + 10, y + 20);
-                g2.drawLine(x + 6, y + 8, x + 18, y + 8);
+    // ==================== CLASSE INTERNE PERSONNALISÉE ====================
 
-                g2.dispose();
-            }
-            public int getIconWidth() { return 24; }
-            public int getIconHeight() { return 24; }
-        };
-    }
+    /**
+     * Bouton de navigation personnalisé avec état actif
+     */
+    private static class NavButton extends JButton {
+        private boolean isActive = false;
 
-    private Icon createUserSVG() {
-        return new Icon() {
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(PRIMARY_COLOR);
-                g2.setStroke(new BasicStroke(2));
+        public NavButton(String text) {
+            super(text);
+        }
 
-                // Utilisateur
-                g2.drawOval(x + 8, y + 4, 8, 8);
-                Path2D path = new Path2D.Double();
-                path.moveTo(x + 5, y + 20);
-                path.curveTo(x + 5, y + 16, x + 8, y + 14, x + 12, y + 14);
-                path.curveTo(x + 16, y + 14, x + 19, y + 16, x + 19, y + 20);
-                g2.draw(path);
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                g2.dispose();
-            }
-            public int getIconWidth() { return 24; }
-            public int getIconHeight() { return 24; }
-        };
-    }
-
-    private Icon createBorrowSVG() {
-        return new Icon() {
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(PRIMARY_COLOR);
-                g2.setStroke(new BasicStroke(2));
-
-                // Échange/Emprunt (flèches circulaires)
-                g2.drawArc(x + 4, y + 4, 16, 16, 45, 270);
-                g2.drawLine(x + 18, y + 6, x + 20, y + 4);
-                g2.drawLine(x + 18, y + 6, x + 20, y + 8);
-
-                g2.dispose();
-            }
-            public int getIconWidth() { return 24; }
-            public int getIconHeight() { return 24; }
-        };
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (isActive) {
+                g2.setColor(HOVER_COLOR);
+                g2.fillRoundRect(5, 0, getWidth() - 10, getHeight(), 8, 8);
+            } else if (getModel().isRollover()) {
+                g2.setColor(new Color(241, 245, 249));
+                g2.fillRoundRect(5, 0, getWidth() - 10, getHeight(), 8, 8);
             }
 
-            MainFrame frame = new MainFrame();
-            frame.setVisible(true);
-        });
+            g2.dispose();
+            super.paintComponent(g);
+        }
+
+        public void setActive(boolean active) {
+            this.isActive = active;
+            repaint();
+        }
+
+        public boolean isActive() {
+            return isActive;
+        }
     }
-}
-// Getters pour accéder aux vues
-public LivreView getLivreView() {
-    LivreView livreView = new LivreView();
-    return livreView;
-}
-
-public MembreView getMembreView() {
-    MembreView membreView = new MembreView();
-    return membreView;
-}
-
-public EmpruntView getEmpruntView() {
-    EmpruntView empruntView = new EmpruntView();
-    return empruntView;
 }

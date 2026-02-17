@@ -1,10 +1,11 @@
-package com.bibliotheque.dao.interfaces;
+package main.java.com.bibliotheque.dao.interfaces;
 
-import com.bibliotheque.model.Emprunt;
+import main.java.com.bibliotheque.model.Emprunt;
 import java.util.List;
 
 public interface EmpruntDAO {
 
+    // Une seule déclaration de cette méthode
     void enregistrerEmprunt(Emprunt emprunt);
 
     void enregistrerRetour(int idEmprunt);
@@ -12,4 +13,6 @@ public interface EmpruntDAO {
     List<Emprunt> findByMembre(int idMembre);
 
     List<Emprunt> findEnCours();
+
+    List<Emprunt> findAll();
 }

@@ -1,7 +1,7 @@
-package com.bibliotheque.controller;
+package main.java.com.bibliotheque.controller;
 
-import com.bibliotheque.model.Livre;
-import com.bibliotheque.service.LivreService;
+import main.java.com.bibliotheque.model.Livre;
+import main.java.com.bibliotheque.service.LivreService;
 import main.java.com.bibliotheque.view.LivreView;
 
 import javax.swing.*;

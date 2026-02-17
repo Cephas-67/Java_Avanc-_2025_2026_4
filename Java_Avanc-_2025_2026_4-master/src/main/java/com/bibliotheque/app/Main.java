@@ -1,8 +1,8 @@
 package main.java.com.bibliotheque.app;
 
-import com.bibliotheque.controller.EmpruntController;
-import com.bibliotheque.controller.LivreController;
-import com.bibliotheque.controller.MembreController;
+import main.java.com.bibliotheque.controller.EmpruntController;
+import main.java.com.bibliotheque.controller.LivreController;
+import main.java.com.bibliotheque.controller.MembreController;
 import main.java.com.bibliotheque.view.MainFrame;
 
 import javax.swing.*;

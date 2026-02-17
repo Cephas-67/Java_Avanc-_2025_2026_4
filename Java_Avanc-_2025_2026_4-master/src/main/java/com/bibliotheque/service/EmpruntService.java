@@ -1,11 +1,11 @@
-package com.bibliotheque.service;
+package main.java.com.bibliotheque.service;
 
-import com.bibliotheque.dao.impl.EmpruntDAOImpl;
-import com.bibliotheque.dao.impl.LivreDAOImpl;
-import com.bibliotheque.dao.impl.MembreDAOImpl;
-import com.bibliotheque.model.Emprunt;
-import com.bibliotheque.model.Livre;
-import com.bibliotheque.model.Membre;
+import main.java.com.bibliotheque.dao.impl.EmpruntDAOImpl;
+import main.java.com.bibliotheque.dao.impl.LivreDAOImpl;
+import main.java.com.bibliotheque.dao.impl.MembreDAOImpl;
+import main.java.com.bibliotheque.model.Emprunt;
+import main.java.com.bibliotheque.model.Livre;
+import main.java.com.bibliotheque.model.Membre;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +20,7 @@ public class EmpruntService {
     private final LivreDAOImpl livreDAO;
 
     public EmpruntService() {
+        // Instanciation directe sans classe interne
         this.empruntDAO = new EmpruntDAOImpl();
         this.membreDAO = new MembreDAOImpl();
         this.livreDAO = new LivreDAOImpl();
@@ -40,16 +41,14 @@ public class EmpruntService {
         }
 
         LocalDate dateEmprunt = LocalDate.now();
-        LocalDate dateRetourPrevue = dateEmprunt.plusWeeks(2); // 2 semaines
+        LocalDate dateRetourPrevue = dateEmprunt.plusWeeks(2);
 
-        Emprunt emprunt = new Emprunt(
-                0,
-                membre,
-                livre,
-                dateEmprunt,
-                dateRetourPrevue,
-                null
-        );
+        Emprunt emprunt = new Emprunt();
+        emprunt.setMembre(membre);
+        emprunt.setLivre(livre);
+        emprunt.setDateEmprunt(dateEmprunt);
+        emprunt.setDateRetourPrevue(dateRetourPrevue);
+        emprunt.setStatut("EN_COURS");
 
         empruntDAO.enregistrerEmprunt(emprunt);
     }
@@ -86,14 +85,14 @@ public class EmpruntService {
     }
 
     /**
-     * Récupérer tous les membres (pour les listes déroulantes)
+     * Récupérer tous les membres
      */
     public List<Membre> getAllMembres() {
         return membreDAO.findAll();
     }
 
     /**
-     * Récupérer tous les livres (pour les listes déroulantes)
+     * Récupérer tous les livres
      */
     public List<Livre> getAllLivres() {
         return livreDAO.findAll();

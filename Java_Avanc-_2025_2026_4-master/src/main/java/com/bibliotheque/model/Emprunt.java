@@ -1,4 +1,4 @@
-package com.bibliotheque.model;
+package main.java.com.bibliotheque.model;
 
 import java.time.LocalDate;
 
@@ -10,8 +10,10 @@ public class Emprunt {
     private LocalDate dateEmprunt;
     private LocalDate dateRetourPrevue;
     private LocalDate dateRetourEffective;
+    private String statut;
 
     public Emprunt() {
+        this.statut = "EN_COURS";
     }
 
     public Emprunt(int idEmprunt, Membre membre, Livre livre,
@@ -24,6 +26,7 @@ public class Emprunt {
         this.dateEmprunt = dateEmprunt;
         this.dateRetourPrevue = dateRetourPrevue;
         this.dateRetourEffective = dateRetourEffective;
+        this.statut = "EN_COURS";
     }
 
     public int getIdEmprunt() {
@@ -72,5 +75,13 @@ public class Emprunt {
 
     public void setDateRetourEffective(LocalDate dateRetourEffective) {
         this.dateRetourEffective = dateRetourEffective;
+    }
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
     }
 }

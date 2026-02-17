@@ -1,4 +1,4 @@
-package com.bibliotheque.model;
+package main.java.com.bibliotheque.model;
 
 public class Genre {
 
@@ -27,5 +27,12 @@ public class Genre {
 
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public Object getDescription() {
+        return null;
+    }
+
+    public void setDescription(Object description) {
     }
 }

@@ -1,19 +1,17 @@
-package com.bibliotheque.model;
+package main.java.com.bibliotheque.model;
 
 public class Livre {
-
     private int idLivre;
     private String titre;
-    private int annee;
+    private int anneePublication;
     private String categorie;
 
-    public Livre() {
-    }
+    public Livre() {}
 
-    public Livre(int idLivre, String titre, int annee, String categorie) {
+    public Livre(int idLivre, String titre, int anneePublication, String categorie) {
         this.idLivre = idLivre;
         this.titre = titre;
-        this.annee = annee;
+        this.anneePublication = anneePublication;
         this.categorie = categorie;
     }
 
@@ -33,12 +31,12 @@ public class Livre {
         this.titre = titre;
     }
 
-    public int getAnnee() {
-        return annee;
+    public int getAnneePublication() {
+        return anneePublication;
     }
 
-    public void setAnnee(int annee) {
-        this.annee = annee;
+    public void setAnneePublication(int anneePublication) {
+        this.anneePublication = anneePublication;
     }
 
     public String getCategorie() {
@@ -49,8 +47,7 @@ public class Livre {
         this.categorie = categorie;
     }
 
-    @Override
-    public String toString() {
-        return titre + " (" + annee + ")";
+    public int getAnnee() {
+        return 0;
     }
 }

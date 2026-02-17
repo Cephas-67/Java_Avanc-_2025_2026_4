@@ -1,6 +1,6 @@
 package main.java.com.bibliotheque.view;
 
-import com.bibliotheque.model.Membre;
+import main.java.com.bibliotheque.model.Membre;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
@@ -444,5 +444,9 @@ public class MembreView extends JPanel {
             public int getIconWidth() { return 16; }
             public int getIconHeight() { return 16; }
         };
+    }
+
+    public JPanel getMainPanel() {
+        return this;
     }
 }

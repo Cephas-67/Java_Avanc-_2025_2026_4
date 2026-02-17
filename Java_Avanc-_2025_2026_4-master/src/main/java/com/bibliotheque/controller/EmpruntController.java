@@ -1,9 +1,9 @@
-package com.bibliotheque.controller;
+package main.java.com.bibliotheque.controller;
 
-import com.bibliotheque.model.Emprunt;
-import com.bibliotheque.model.Livre;
-import com.bibliotheque.model.Membre;
-import com.bibliotheque.service.EmpruntService;
+import main.java.com.bibliotheque.model.Emprunt;
+import main.java.com.bibliotheque.model.Livre;
+import main.java.com.bibliotheque.model.Membre;
+import main.java.com.bibliotheque.service.EmpruntService;
 import main.java.com.bibliotheque.view.EmpruntView;
 
 import javax.swing.*;
