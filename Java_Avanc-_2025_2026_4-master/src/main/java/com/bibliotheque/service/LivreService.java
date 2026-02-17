@@ -1,0 +1,103 @@
+package main.java.com.bibliotheque.service;
+
+import main.java.com.bibliotheque.dao.impl.LivreDAOImpl;
+import main.java.com.bibliotheque.dao.interfaces.LivreDAO;
+import main.java.com.bibliotheque.model.Livre;
+
+import java.util.List;
+
+/**
+ * Service pour la gestion des livres avec logique métier
+ */
+public class LivreService {
+
+    private final LivreDAOImpl livreDAO;
+
+    public LivreService() {
+        this.livreDAO = new LivreDAOImpl();
+    }
+
+    /**
+     * Ajouter un nouveau livre avec validation
+     */
+    public void addLivre(Livre livre) throws Exception {
+        validateLivre(livre);
+        livreDAO.add(livre);
+    }
+
+    /**
+     * Modifier un livre existant
+     */
+    public void updateLivre(Livre livre) throws Exception {
+        if (livre.getIdLivre() <= 0) {
+            throw new Exception("ID du livre invalide");
+        }
+        validateLivre(livre);
+        livreDAO.update(livre);
+    }
+
+    /**
+     * Supprimer un livre
+     */
+    public void deleteLivre(int idLivre) throws Exception {
+        if (idLivre <= 0) {
+            throw new Exception("ID du livre invalide");
+        }
+        livreDAO.delete(idLivre);
+    }
+
+    /**
+     * Rechercher un livre par ID
+     */
+    public Livre findById(int idLivre) {
+        return livreDAO.findById(idLivre);
+    }
+
+    /**
+     * Récupérer tous les livres
+     */
+    public List<Livre> getAllLivres() {
+        return livreDAO.findAll();
+    }
+
+    /**
+     * Rechercher des livres par mot-clé
+     */
+    public List<Livre> searchLivres(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return getAllLivres();
+        }
+        return livreDAO.search(keyword.trim());
+    }
+
+    /**
+     * Valider les données d'un livre
+     */
+    private void validateLivre(Livre livre) throws Exception {
+        if (livre == null) {
+            throw new Exception("Le livre ne peut pas être null");
+        }
+
+        if (livre.getTitre() == null || livre.getTitre().trim().isEmpty()) {
+            throw new Exception("Le titre est obligatoire");
+        }
+
+        // ✅ CORRECTION : Validation d'année assouplie ou supprimée
+        // Option 1: Supprimer complètement la validation d'année
+        // (décommentez cette ligne si vous voulez aucune validation)
+        // if (// ✅ BON
+        //livre.getAnneePublication()  <= 0) {
+        //     throw new Exception("L'année de publication doit être un nombre positif");
+        // }
+
+        // Option 2: Validation très permissive (année > 0)
+        if (livre.getAnneePublication() <= 0) {
+            throw new Exception("L'année de publication doit être un nombre positif");
+        }
+
+        // Option 3: Validation raisonnable (entre 1 et 9999)
+        // if (livre.getAnneePublication() < 1 || livre.getAnnee() > 9999) {
+        //     throw new Exception("L'année de publication doit être entre 1 et 9999");
+        // }
+    }
+}
