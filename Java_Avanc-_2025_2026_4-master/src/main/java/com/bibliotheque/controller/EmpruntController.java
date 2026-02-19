@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import main.java.com.bibliotheque.config.DatabaseConfig;
 
 public class EmpruntController {
 
@@ -60,6 +61,8 @@ public class EmpruntController {
                 if (membre != null && livre != null) {
                     service.enregistrerEmprunt(membre.getIdMembre(), livre.getIdLivre());
                     loadEmprunts();
+                    DatabaseConfig.addEmprunt(membre.getIdMembre(), livre.getIdLivre(),
+                            dialog.getDateEmprunt(), dialog.getDateRetourPrevue());
                     showSuccess("Emprunt enregistré avec succès !");
                 }
             }

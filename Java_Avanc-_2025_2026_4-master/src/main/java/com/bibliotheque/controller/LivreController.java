@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import main.java.com.bibliotheque.config.DatabaseConfig;
 
 public class LivreController {
 
@@ -62,6 +63,8 @@ public class LivreController {
                 if (livre != null) {
                     service.addLivre(livre);
                     loadLivres();
+                    DatabaseConfig.addBook(livre.getIdLivre(), livre.getTitre(), livre.getAnnee(),
+                            livre.getCategorie(), livre.getAuteur(), livre.getMaisonEdition());
                     showSuccess("Livre ajouté avec succès !");
                 }
             }
@@ -94,6 +97,8 @@ public class LivreController {
                 if (livre != null) {
                     service.updateLivre(livre);
                     loadLivres();
+                    DatabaseConfig.updateBook(livre.getIdLivre(), livre.getTitre(), livre.getAnnee(),
+                            livre.getCategorie(), livre.getAuteur(), livre.getMaisonEdition());
                     showSuccess("Livre modifié avec succès !");
                 }
             }
@@ -124,6 +129,7 @@ public class LivreController {
             if (confirm == JOptionPane.YES_OPTION) {
                 service.deleteLivre(selectedLivre.getIdLivre());
                 loadLivres();
+                DatabaseConfig.deleteBook(selectedLivre.getIdLivre());
                 showSuccess("Livre supprimé avec succès !");
             }
 

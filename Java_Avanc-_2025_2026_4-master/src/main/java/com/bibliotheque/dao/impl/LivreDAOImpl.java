@@ -53,6 +53,8 @@ public class LivreDAOImpl implements LivreDAO {
             existing.setTitre(livre.getTitre());
             existing.setAnneePublication(livre.getAnneePublication());
             existing.setCategorie(livre.getCategorie());
+            existing.setAuteur(livre.getAuteur());
+            existing.setMaisonEdition(livre.getMaisonEdition());
         } else {
             throw new RuntimeException("Livre non trouvé avec l'ID: " + livre.getIdLivre());
         }

@@ -12,11 +12,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import main.java.com.bibliotheque.config.DatabaseConfig;
 
 public class MembreController {
 
     private final MembreView view;
     private final MembreService service;
+    
+     int toInt(String s, int def) {
+        try { return Integer.parseInt(s); } catch (Exception e) { return def; }
+    }
+    
+    double toDouble(String s, double def) {
+        try { return Double.parseDouble(s); } catch (Exception e) { return def; }
+    }
+    
 
     public MembreController(MembreView view) {
         this.view = view;
@@ -62,6 +72,10 @@ public class MembreController {
                 if (membre != null) {
                     service.addMembre(membre);
                     loadMembres();
+                     DatabaseConfig.AddMember(membre.getIdMembre(), membre.getNom(), membre.getPrenom(),
+                    membre.getEmail(),membre.getTelephone(),
+                    membre.getLieuResidence(), toDouble(String.format("%.2f €",
+                            membre.getPenalite()),0));
                     showSuccess("Membre ajouté avec succès !");
                 }
             }
@@ -94,6 +108,10 @@ public class MembreController {
                 if (membre != null) {
                     service.updateMembre(membre);
                     loadMembres();
+                    DatabaseConfig.updateMember(membre.getIdMembre(),membre.getNom(),
+                        membre.getPrenom(),membre.getEmail(),
+                        membre.getTelephone(), membre.getLieuResidence(),
+                        toDouble(String.format("%.2f €", membre.getPenalite()),0));
                     showSuccess("Membre modifié avec succès !");
                 }
             }
@@ -124,6 +142,7 @@ public class MembreController {
             if (confirm == JOptionPane.YES_OPTION) {
                 service.deleteMembre(selectedMembre.getIdMembre());
                 loadMembres();
+                DatabaseConfig.deleteMember(selectedMembre.getIdMembre());
                 showSuccess("Membre supprimé avec succès !");
             }
 
