@@ -7,33 +7,52 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Implémentation du DAO pour la gestion des livres (SANS BASE DE DONNÉES)
- */
 public class LivreDAOImpl implements LivreDAO {
 
-    // Stockage en mémoire
     private final List<Livre> livres = new ArrayList<>();
     private int nextId = 1;
+
+    public LivreDAOImpl() {
+        initializeNextId();
+    }
+    // Méthode pour réinitialiser tous les livres
+    public void reset() {
+        livres.clear();
+        nextId = 1;
+        System.out.println("Tous les livres ont été réinitialisés.");
+    }
+
+    private void initializeNextId() {
+        nextId = livres.stream()
+                .mapToInt(Livre::getIdLivre)
+                .max()
+                .orElse(0) + 1;
+    }
 
     @Override
     public void add(Livre livre) {
         if (livre == null) {
             throw new IllegalArgumentException("Le livre ne peut pas être null");
         }
-        livre.setIdLivre(nextId++);
+
+        if (livre.getIdLivre() <= 0) {
+            livre.setIdLivre(nextId);
+        } else if (livre.getIdLivre() >= nextId) {
+            nextId = livre.getIdLivre() + 1;
+        }
+
         livres.add(livre);
+        nextId++;
         System.out.println("Livre ajouté avec succès: " + livre.getTitre() + " (ID: " + livre.getIdLivre() + ")");
     }
 
     @Override
     public void update(Livre livre) {
-        Livre existingLivre = findById(livre.getIdLivre());
-        if (existingLivre != null) {
-            existingLivre.setTitre(livre.getTitre());
-            existingLivre.setAnneePublication(livre.getAnneePublication());
-            existingLivre.setCategorie(livre.getCategorie());
-            System.out.println("Livre modifié avec succès: " + livre.getTitre());
+        Livre existing = findById(livre.getIdLivre());
+        if (existing != null) {
+            existing.setTitre(livre.getTitre());
+            existing.setAnneePublication(livre.getAnneePublication());
+            existing.setCategorie(livre.getCategorie());
         } else {
             throw new RuntimeException("Livre non trouvé avec l'ID: " + livre.getIdLivre());
         }
@@ -44,7 +63,6 @@ public class LivreDAOImpl implements LivreDAO {
         Livre livre = findById(idLivre);
         if (livre != null) {
             livres.remove(livre);
-            System.out.println("Livre supprimé avec succès (ID: " + idLivre + ")");
         } else {
             throw new RuntimeException("Livre non trouvé avec l'ID: " + idLivre);
         }
@@ -63,12 +81,16 @@ public class LivreDAOImpl implements LivreDAO {
         return new ArrayList<>(livres);
     }
 
-    /**
-     * Méthode de recherche (si elle existe dans l'interface)
-     */
+    @Override
     public List<Livre> search(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return findAll();
+        }
+        String lower = keyword.toLowerCase().trim();
         return livres.stream()
-                .filter(l -> l.getTitre().toLowerCase().contains(keyword.toLowerCase()))
+                .filter(l -> l.getTitre().toLowerCase().contains(lower) ||
+                        l.getCategorie().toLowerCase().contains(lower) ||
+                        String.valueOf(l.getAnneePublication()).contains(lower))
                 .collect(Collectors.toList());
     }
 }

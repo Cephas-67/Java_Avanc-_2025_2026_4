@@ -5,49 +5,42 @@ public class Livre {
     private String titre;
     private int anneePublication;
     private String categorie;
+    private String auteur;
+    private String maisonEdition;
 
     public Livre() {}
 
+    public Livre(int idLivre, String titre, int anneePublication, String categorie,
+                 String auteur, String maisonEdition) {
+        this.idLivre = idLivre;
+        this.titre = titre;
+        this.anneePublication = anneePublication;
+        this.categorie = categorie;
+        this.auteur = auteur;
+        this.maisonEdition = maisonEdition;
+    }
+
     public Livre(int idLivre, String titre, int anneePublication, String categorie) {
-        this.idLivre = idLivre;
-        this.titre = titre;
-        this.anneePublication = anneePublication;
-        this.categorie = categorie;
+        this(idLivre, titre, anneePublication, categorie, "", "");
     }
 
-    public int getIdLivre() {
-        return idLivre;
-    }
+    public int getIdLivre() { return idLivre; }
+    public void setIdLivre(int idLivre) { this.idLivre = idLivre; }
 
-    public void setIdLivre(int idLivre) {
-        this.idLivre = idLivre;
-    }
+    public String getTitre() { return titre; }
+    public void setTitre(String titre) { this.titre = titre; }
 
-    public String getTitre() {
-        return titre;
-    }
+    public int getAnneePublication() { return anneePublication; }
+    public void setAnneePublication(int anneePublication) { this.anneePublication = anneePublication; }
 
-    public void setTitre(String titre) {
-        this.titre = titre;
-    }
+    public String getCategorie() { return categorie; }
+    public void setCategorie(String categorie) { this.categorie = categorie; }
 
-    public int getAnneePublication() {
-        return anneePublication;
-    }
+    public String getAuteur() { return auteur; }
+    public void setAuteur(String auteur) { this.auteur = auteur; }
 
-    public void setAnneePublication(int anneePublication) {
-        this.anneePublication = anneePublication;
-    }
+    public String getMaisonEdition() { return maisonEdition; }
+    public void setMaisonEdition(String maisonEdition) { this.maisonEdition = maisonEdition; }
 
-    public String getCategorie() {
-        return categorie;
-    }
-
-    public void setCategorie(String categorie) {
-        this.categorie = categorie;
-    }
-
-    public int getAnnee() {
-        return anneePublication;
-    }
+    public int getAnnee() { return anneePublication; }
 }

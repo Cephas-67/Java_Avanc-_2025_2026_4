@@ -4,16 +4,15 @@ import main.java.com.bibliotheque.model.Emprunt;
 import main.java.com.bibliotheque.model.Livre;
 import main.java.com.bibliotheque.model.Membre;
 import main.java.com.bibliotheque.service.EmpruntService;
+import main.java.com.bibliotheque.view.EmpruntDialog;
 import main.java.com.bibliotheque.view.EmpruntView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-/**
- * Contrôleur pour gérer les interactions de la vue Emprunt
- */
 public class EmpruntController {
 
     private final EmpruntView view;
@@ -23,110 +22,54 @@ public class EmpruntController {
         this.view = view;
         this.service = new EmpruntService();
         initController();
-        loadData();
+        loadEmprunts();
     }
 
-    /**
-     * Initialiser les écouteurs d'événements
-     */
     private void initController() {
-        // Bouton Enregistrer Emprunt
-        view.getAddButton().addActionListener(e -> handleAddEmprunt());
-
-        // Bouton Enregistrer Retour
+        view.getAddButton().addActionListener(e -> showAddDialog());
         view.getReturnButton().addActionListener(e -> handleReturn());
-
-        // Bouton Supprimer
         view.getDeleteButton().addActionListener(e -> handleDelete());
-
-        // Bouton Actualiser
         view.getRefreshButton().addActionListener(e -> loadEmprunts());
 
-        // Recherche (optionnelle pour les emprunts)
         view.getSearchField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                // La recherche peut être implémentée plus tard si nécessaire
+                handleSearch();
             }
         });
     }
 
-    /**
-     * Charger les données initiales
-     */
-    private void loadData() {
-        loadMembres();
-        loadLivres();
-        loadEmprunts();
-    }
-
-    /**
-     * Charger la liste des membres dans le combo
-     */
-    private void loadMembres() {
+    private void showAddDialog() {
         try {
+            EmpruntDialog dialog = new EmpruntDialog(
+                    (Frame) SwingUtilities.getWindowAncestor(view)
+            );
+
             List<Membre> membres = service.getAllMembres();
-            view.updateMembreCombo(membres);
-        } catch (Exception ex) {
-            showError("Erreur lors du chargement des membres: " + ex.getMessage());
-        }
-    }
-
-    /**
-     * Charger la liste des livres dans le combo
-     */
-    private void loadLivres() {
-        try {
             List<Livre> livres = service.getAllLivres();
-            view.updateLivreCombo(livres);
-        } catch (Exception ex) {
-            showError("Erreur lors du chargement des livres: " + ex.getMessage());
-        }
-    }
 
-    /**
-     * Charger tous les emprunts
-     */
-    private void loadEmprunts() {
-        try {
-            List<Emprunt> emprunts = service.getAllEmprunts();
-            displayEmprunts(emprunts);
-        } catch (Exception ex) {
-            showError("Erreur lors du chargement des emprunts: " + ex.getMessage());
-        }
-    }
+            dialog.setMembres(membres);
+            dialog.setLivres(livres);
 
-    /**
-     * Gérer l'ajout d'un emprunt
-     */
-    private void handleAddEmprunt() {
-        try {
-            int idMembre = view.getSelectedMembreId();
-            int idLivre = view.getSelectedLivreId();
+            dialog.setVisible(true);
 
-            if (idMembre == -1) {
-                showWarning("Veuillez sélectionner un membre.");
-                return;
+            if (dialog.isSaved()) {
+                Membre membre = dialog.getSelectedMembre();
+                Livre livre = dialog.getSelectedLivre();
+
+                if (membre != null && livre != null) {
+                    service.enregistrerEmprunt(membre.getIdMembre(), livre.getIdLivre());
+                    loadEmprunts();
+                    showSuccess("Emprunt enregistré avec succès !");
+                }
             }
 
-            if (idLivre == -1) {
-                showWarning("Veuillez sélectionner un livre.");
-                return;
-            }
-
-            service.enregistrerEmprunt(idMembre, idLivre);
-            view.clearForm();
-            loadEmprunts();
-            showSuccess("Emprunt enregistré avec succès!");
-
         } catch (Exception ex) {
-            showError("Erreur lors de l'enregistrement de l'emprunt: " + ex.getMessage());
+            showError("Erreur lors de l'enregistrement de l'emprunt : " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
-    /**
-     * Gérer le retour d'un emprunt
-     */
     private void handleReturn() {
         try {
             int idEmprunt = view.getSelectedEmpruntId();
@@ -138,7 +81,7 @@ public class EmpruntController {
 
             int confirm = JOptionPane.showConfirmDialog(
                     null,
-                    "Confirmer le retour de ce livre?",
+                    "Confirmer le retour de ce livre ?",
                     "Confirmation de retour",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE
@@ -147,24 +90,37 @@ public class EmpruntController {
             if (confirm == JOptionPane.YES_OPTION) {
                 service.enregistrerRetour(idEmprunt);
                 loadEmprunts();
-                showSuccess("Retour enregistré avec succès!");
+                showSuccess("Retour enregistré avec succès !");
             }
 
         } catch (Exception ex) {
-            showError("Erreur lors de l'enregistrement du retour: " + ex.getMessage());
+            showError("Erreur lors de l'enregistrement du retour : " + ex.getMessage());
         }
     }
 
-    /**
-     * Gérer la suppression d'un emprunt (non implémentée car généralement on ne supprime pas les emprunts)
-     */
     private void handleDelete() {
         showWarning("La suppression des emprunts n'est pas autorisée pour préserver l'historique.");
     }
 
-    /**
-     * Afficher la liste des emprunts dans le tableau
-     */
+    private void handleSearch() {
+        String keyword = view.getSearchField().getText().trim();
+        try {
+            List<Emprunt> emprunts = service.searchEmprunts(keyword);
+            displayEmprunts(emprunts);
+        } catch (Exception ex) {
+            showError("Erreur lors de la recherche : " + ex.getMessage());
+        }
+    }
+
+    private void loadEmprunts() {
+        try {
+            List<Emprunt> emprunts = service.getAllEmprunts();
+            displayEmprunts(emprunts);
+        } catch (Exception ex) {
+            showError("Erreur lors du chargement des emprunts : " + ex.getMessage());
+        }
+    }
+
     private void displayEmprunts(List<Emprunt> emprunts) {
         view.clearTable();
         for (Emprunt emprunt : emprunts) {
@@ -172,39 +128,15 @@ public class EmpruntController {
         }
     }
 
-    /**
-     * Afficher un message de succès
-     */
     private void showSuccess(String message) {
-        JOptionPane.showMessageDialog(
-                null,
-                message,
-                "Succès",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        JOptionPane.showMessageDialog(null, message, "Succès", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Afficher un message d'erreur
-     */
     private void showError(String message) {
-        JOptionPane.showMessageDialog(
-                null,
-                message,
-                "Erreur",
-                JOptionPane.ERROR_MESSAGE
-        );
+        JOptionPane.showMessageDialog(null, message, "Erreur", JOptionPane.ERROR_MESSAGE);
     }
 
-    /**
-     * Afficher un message d'avertissement
-     */
     private void showWarning(String message) {
-        JOptionPane.showMessageDialog(
-                null,
-                message,
-                "Attention",
-                JOptionPane.WARNING_MESSAGE
-        );
+        JOptionPane.showMessageDialog(null, message, "Attention", JOptionPane.WARNING_MESSAGE);
     }
 }

@@ -1,7 +1,7 @@
 package main.java.com.bibliotheque.dao.impl;
 
 import main.java.com.bibliotheque.dao.interfaces.EmpruntDAO;
-import main.java.com.bibliotheque.model.Emprunt;  // <-- Vérifiez cet import
+import main.java.com.bibliotheque.model.Emprunt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,8 +18,13 @@ public class EmpruntDAOImpl implements EmpruntDAO {
         if (emprunt == null) {
             throw new IllegalArgumentException("L'emprunt ne peut pas être null");
         }
-        emprunt.setIdEmprunt(nextId++);
+        if (emprunt.getIdEmprunt() <= 0) {
+            emprunt.setIdEmprunt(nextId);
+        } else if (emprunt.getIdEmprunt() >= nextId) {
+            nextId = emprunt.getIdEmprunt() + 1;
+        }
         emprunts.add(emprunt);
+        nextId++;
         System.out.println("Emprunt enregistré avec succès (ID: " + emprunt.getIdEmprunt() + ")");
     }
 
@@ -54,10 +59,23 @@ public class EmpruntDAOImpl implements EmpruntDAO {
         return new ArrayList<>(emprunts);
     }
 
-    private Emprunt findById(int idEmprunt) {
+    // ✅ CORRECTION : Rendre findById PUBLIC
+    public Emprunt findById(int idEmprunt) {
         return emprunts.stream()
                 .filter(e -> e.getIdEmprunt() == idEmprunt)
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public List<Emprunt> search(String keyword) {
+        return List.of();
+    }
+
+    // ✅ NOUVELLE MÉTHODE - Réinitialiser tous les emprunts
+    public void reset() {
+        emprunts.clear();
+        nextId = 1;
+        System.out.println("Tous les emprunts ont été réinitialisés.");
     }
 }

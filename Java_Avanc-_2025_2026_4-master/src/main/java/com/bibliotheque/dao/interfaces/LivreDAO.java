@@ -9,4 +9,5 @@ public interface LivreDAO {
     void delete(int idLivre);
     Livre findById(int idLivre);
     List<Livre> findAll();
+    List<Livre> search(String keyword);
 }
